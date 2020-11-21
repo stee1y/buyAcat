@@ -1,36 +1,112 @@
-const catAll = {}
+const catAll = []
 
-let catAllMax = ((max = 99) => Math.floor(Math.random() * Math.floor(max)))()
+let catAllMax = ((max = 50) => Math.floor(Math.random() * Math.floor(max)))()
 
-console.log(catAllMax)
+function declOfNum(n, arr) {
+  n = Math.abs(n) % 100 // фу-ия склонения
 
-function catShow(val) {
-  for (val; val > 0; val--) {
-    if (catAllMax--) {
-      let div = document.createElement('div')
-      const photo = catGen(1, 3)
-      const price = catGen(10000, 30000)
-      const catAge = catGen(1, 12)
+  const n1 = n % 10
+
+  if (n > 10 && n < 20) {
+    return arr[3]
+  }
+  if (n1 > 1 && n1 < 5) {
+    return arr[2]
+  }
+  if (n1 == 1) {
+    return arr[1]
+  }
+  if (n1 == 0) {
+    return arr[0]
+  }
+  return arr[3]
+}
+
+const quantityDeclination =
+  catAllMax +
+  1 +
+  ' ' +
+  declOfNum(catAllMax + 1, ['котов', 'кот', 'кота', 'котов'])
+
+document.querySelector(
+  '.found-cats'
+).innerHTML = `Найдено ${quantityDeclination}`
+
+for (let index = 0; index <= catAllMax; index++) {
+  catAll.push(
+    Object.create(
+      {},
+      {
+        id: {
+          value: index + 1, // id кота
+        },
+        photo: {
+          value: gen(1, 3), // фото кота
+        },
+        discount: {
+          value: gen(0, 5) * 10, // скидка
+        },
+        hasDiscount: {
+          get() {
+            return this.discount !== 0 ? true : false // есть ли скидка
+          },
+        },
+        price: {
+          value: gen(10000, 30000), // цена
+        },
+        discountPrice: {
+          get() {
+            return Math.round(this.price - (this.price / 100) * this.discount) // получаем цену со скидкой в зависимости от скидки в поле discount
+          },
+        },
+        catAge: {
+          value: gen(1, 12), // возраст
+        },
+        like: {
+          value: false, // подписка
+          writable: true,
+        },
+        availability: {
+          value: gen(1, 10) <= 7 ? true : false, // доступен ли для продажи
+          writable: true,
+        },
+      }
+    )
+  )
+}
+
+let count = 0
+
+function catShow(val, obj) {
+  for (let i = val; i > 0; i--) {
+    if (count <= catAllMax) {
+      const div = document.createElement('div')
+
+      const id = catAll[count].id
+      const photo = catAll[count].photo
+      const discount = catAll[count].discount
+      const hasDiscount = catAll[count].hasDiscount
+      const price = catAll[count].price
+      const discountPrice = catAll[count].discountPrice
+      const catAge = catAll[count].catAge
+      const like = catAll[count].like
+      const availability = catAll[count].availability
+
+      count++
 
       div.classList.add('card')
-      div.setAttribute('data-price', price)
+      div.setAttribute('data-id', id)
+      hasDiscount
+        ? div.setAttribute('data-price', discountPrice)
+        : div.setAttribute('data-price', price)
       div.setAttribute('data-months', catAge)
       div.innerHTML = `
-              <div class="card__discount">-40%</div>
-              <a href="#info-popap" class="card__liked">
-                <svg
-                  width="46"
-                  height="42"
-                  viewBox="0 0 46 42"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M33.7812 0.695312C31.2851 0.695312 28.9966 1.4863 26.9794 3.04634C25.0456 4.54197 23.758 6.44693 23 7.83214C22.242 6.44684 20.9544 4.54197 19.0206 3.04634C17.0034 1.4863 14.7149 0.695312 12.2188 0.695312C5.25298 0.695312 0 6.39293 0 13.9485C0 22.1112 6.55347 27.696 16.4746 36.1505C18.1593 37.5863 20.0689 39.2138 22.0538 40.9494C22.3154 41.1785 22.6514 41.3047 23 41.3047C23.3486 41.3047 23.6846 41.1785 23.9462 40.9495C25.9312 39.2136 27.8408 37.5862 29.5265 36.1496C39.4465 27.696 46 22.1112 46 13.9485C46 6.39293 40.747 0.695312 33.7812 0.695312Z"
-                    fill="white"
-                    fill-opacity="0.5"
-                  />
-                </svg>
+              ${
+                hasDiscount
+                  ? `<div class="card__discount">-${discount}%</div>`
+                  : ''
+              }
+              <a class="card__liked">
                 liked
               </a>
               <img src="./img/cat-${photo}.jpg" alt="Фотография котика" />
@@ -41,34 +117,48 @@ function catShow(val) {
                   <div class="card__age"><span>${catAge} мес.</span>Возраст</div>
                   <div class="card__paws"><span>${4} </span>Кол-во лап</div>
                 </div>
-                <div class="card__price">${price} руб.</div>
+                ${
+                  hasDiscount
+                    ? `<div class="card__price">${discountPrice} руб.</div>`
+                    : `<div class="card__price">${price} руб.</div>`
+                }
+                
               </div>
-              <a class="btn btn--card">Купить</a>
+              ${
+                availability
+                  ? `<a data-btn='0' class="btn btn--card btn--disabled">Продан</a>`
+                  : `<a data-btn='1' class="btn btn--card">Купить</a>`
+              }
+              
             `
-
+      // console.log(hasDiscount)
+      hasDiscount ? div.append(``) : false
       document.querySelector('.main__content').append(div)
     } else {
-      return
+      return false
     }
   }
 }
 
-function catGen(min, max) {
-  return Math.round(Math.random() * (max - min) + min)
+function gen(min, max, discount = 0) {
+  return (
+    Math.round(Math.random() * (max - min) + min) -
+    (Math.round(Math.random() * (max - min) + min) / 100) * discount
+  )
 }
 
 window.onload = function () {
-  catShow(6)
-  console.log(catAllMax)
+  // console.log('max при загруэке', catAllMax)
+  catShow(6, catAll)
 }
 
-const btnMore = document.querySelector('.btn--more ')
+const btnMore = document.querySelector('.btn--more')
 
 btnMore.addEventListener('click', (e) => {
   e.preventDefault()
 
-  if (catAllMax != -1) {
-    catShow(20)
+  if (catAllMax != 0) {
+    catShow(20, catAll)
   }
 })
 
@@ -160,6 +250,30 @@ function sortAgeDown(e) {
     .forEach((e) => content.append(e))
 }
 
+content.addEventListener('click', (e) => {
+  // обработка лайка
+  e.preventDefault()
+
+  if (e.target.classList.contains('card__liked')) {
+    if (!e.target.classList.contains('card__liked--true')) {
+      e.target.classList.add('card__liked--true')
+      catAll[e.target.closest('div').getAttribute('data-id') - 1].like = true
+      modal('Мне понравился этот котик')
+    } else {
+      e.target.classList.remove('card__liked--true')
+      catAll[e.target.closest('div').getAttribute('data-id') - 1].like = true
+      modal('Мне больше не нравится этот котик')
+    }
+  } else if (e.target.getAttribute('data-btn')) {
+    if (e.target.getAttribute('data-btn') == true) {
+      modal('Дальнейшие действия...')
+    } else {
+      modal('У этого котика уже есть дом')
+    }
+  }
+  return false
+})
+
 // меню
 
 const menu = document.querySelector('input[id=menu__toggle]')
@@ -170,7 +284,6 @@ menu.addEventListener('change', (e) => {
     document.querySelector('body').style.overflow = 'visible'
   }
 })
-const popupInfo = document.querySelector('.info-popap')
 
 const linkNav = document.querySelectorAll('[href^="#"]'),
   V = 0.2
@@ -179,20 +292,6 @@ for (let i = 0; i < linkNav.length; i++) {
     'click',
     function (e) {
       e.preventDefault()
-      // обработка лайка
-      if (e.path.find((e) => e.href).classList.contains('card__liked')) {
-        if (
-          !e.path.find((e) => e.href).classList.contains('card__liked--true')
-        ) {
-          e.path.find((e) => e.href).classList.add('card__liked--true')
-          document.querySelector('.info-popap__text').innerHTML =
-            'Вы добавили в избранное'
-          popupInfo.classList.remove('hidden')
-          setTimeout((e) => popupInfo.classList.add('hidden'), 2000)
-        } else {
-          e.path.find((e) => e.href).classList.remove('card__liked--true')
-        }
-      }
 
       let w = window.pageYOffset,
         hash = this.href.replace(/[^#]*(.*)/, '$1')
@@ -225,30 +324,33 @@ for (let i = 0; i < linkNav.length; i++) {
 const form = document.querySelector('form')
 form.addEventListener('submit', validateEmail)
 
+// const infoArr = []
+
+function modal(item) {
+  const div = document.createElement('div')
+  div.classList.add('info-popap')
+  div.innerHTML = `<div class="info-popap__text">${item}</div>`
+  document.querySelector('.info').append(div)
+  setTimeout(() => {
+    div.parentNode.removeChild(div)
+  }, 3000)
+}
+
 function validateEmail(e) {
   e.preventDefault()
   const reg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
   const address = e.target.elements['email'].value
   const subscription = e.target.elements['subscription'].checked
+
   if (reg.test(address) == false) {
-    document.querySelector('.info-popap__text').innerHTML =
-      'Введите корректный e-mail'
-    popupInfo.classList.remove('hidden')
-    setTimeout((e) => popupInfo.classList.add('hidden'), 3000)
+    modal('Введите корректный e-mail')
     e.target.reset()
     return false
   } else if (!subscription) {
-    document.querySelector('.info-popap__text').innerHTML =
-      'Вы не подтвердили подписку'
-    popupInfo.classList.remove('hidden')
-    setTimeout((e) => popupInfo.classList.add('hidden'), 3000)
+    modal('Вы не подтвердили подписку')
     return false
   } else {
-    // отправка формы
-    document.querySelector('.info-popap__text').innerHTML =
-      'Вы подписались на наших котиков!'
-    popupInfo.classList.remove('hidden')
-    setTimeout((e) => popupInfo.classList.add('hidden'), 3000)
+    modal('Вы подписались на наших котиков!')
     e.target.reset()
   }
 }

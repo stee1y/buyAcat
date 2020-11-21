@@ -350,6 +350,12 @@ template {
   display: none;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 @font-face {
   font-family: 'Montserrat-Regular';
   src: url('../fonts/Montserrat-Regular.eot');
@@ -417,10 +423,9 @@ a {
 }
 
 .btn--more {
-  max-width: 380px;
   font-family: 'Montserrat-Regular';
   margin: 0 auto;
-  padding: 24px 129px;
+  padding: 24px 120px;
   background-color: transparent;
   color: #000;
   border: 1px solid #cacaca;
@@ -428,6 +433,7 @@ a {
 
 .btn--disabled {
   cursor: auto;
+  color: #fff;
   background-color: #1f2021;
 }
 .btn--disabled:hover,
@@ -555,11 +561,23 @@ a {
   flex-direction: column;
   justify-content: space-between;
   position: relative;
-  max-width: 380px;
+  max-width: 360px;
   margin: 20px 10px;
   background: #f3f3f3;
   border-radius: 0 0 20px 20px;
   overflow: hidden;
+  animation-name: showCard;
+  animation-duration: 0.5s;
+  animation-timing-function: ease;
+}
+
+@keyframes showCard {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .card img {
@@ -615,14 +633,17 @@ a {
   font-size: 0;
   top: 35px;
   right: 36px;
+  width: 42px;
+  background-image: url('../img/liked-false.svg');
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 42px;
+  z-index: 3;
 }
 
-svg path {
-  fill-opacity: 0.5;
-}
-
-.card__liked--true svg path {
-  fill-opacity: 1;
+.card__liked--true {
+  background-image: url('../img/liked-true.svg');
 }
 
 .main__end {
@@ -697,7 +718,7 @@ svg path {
 }
 
 .form__email {
-  width: 270px;
+  width: 320px;
   height: 65px;
   border-radius: 10px;
   border: none;
@@ -752,19 +773,31 @@ svg path {
   margin: 0 0 20px 0;
 }
 
+.info {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
 .info-popap {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 3;
+  max-width: 1111px;
+  margin: 5px auto;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 10px;
+  z-index: 15;
 }
 
 .info-popap__text {
+  text-align: center;
   padding: 15px;
   font-size: 18px;
   color: #fff;
